@@ -31,8 +31,8 @@ float altitude(const int32_t press, const float seaLevel) {
   return (Altitude);
 }  // of method altitude()
 
-const char* ssid = "LABORATORIO-B";
-const char* password = "";
+const char* ssid = "A15 de Luci";
+const char* password = "luciicai";
 
 // Declaring a global variabl for sensor data
 double sensorVal, sensorVal1, sensorVal2, sensorVal3 ; 
@@ -40,15 +40,26 @@ double sensorVal, sensorVal1, sensorVal2, sensorVal3 ;
 // This function creates the timer object. It's part of Blynk library 
 BlynkTimer timer; 
 
-void myTimer() 
-{
+void myTimer() {
   // This function describes what will happen with each timer tick
   // e.g. writing sensor value to datastream V5
   
   Blynk.virtualWrite(V2, sensorVal);  
   Blynk.virtualWrite(V0, sensorVal1);  
   Blynk.virtualWrite(V3, sensorVal2);  
-  //Blynk.virtualWrite(V1, sensorVal3);  
+  Blynk.virtualWrite(V1, sensorVal3);
+}
+
+// Esta función se ejecuta cada vez que la app Blynk envía un valor al pin virtual
+BLYNK_WRITE(V4) {
+  int valorRecibido = param.asInt();
+  Serial.print("Paso el umbral de temp? ");
+  Serial.println(valorRecibido);
+  // prendemos el led 
+  pinMode(5, OUTPUT); // led rojo 
+  pinMode(19, OUTPUT); // led verde
+  digitalWrite(5, LOW);    
+  digitalWrite(19, HIGH); 
 }
 
 
@@ -70,11 +81,11 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.print(".");
-    digitalWrite(5, HIGH);    // Led OFF
+    digitalWrite(5, HIGH);    
   }
   Serial.println("Connected to WiFi");         
-  digitalWrite(5, LOW);    // Led OFF
-  digitalWrite(19, HIGH);    // Led OFF
+  digitalWrite(5, LOW);    
+  digitalWrite(19, HIGH);    
 
   /*!
   @brief    Arduino method called once at startup to initialize the system
