@@ -31,8 +31,8 @@ float altitude(const int32_t press, const float seaLevel) {
   return (Altitude);
 }  // of method altitude()
 
-const char* ssid = "A15 de Luci";
-const char* password = "luciicai";
+const char* ssid = "LABORATORIO-B"; //"A15 de Luci";
+const char* password = ""; //"luciicai";
 
 // Declaring a global variabl for sensor data
 double sensorVal, sensorVal1, sensorVal2, sensorVal3 ; 
@@ -52,18 +52,27 @@ void myTimer() {
 
 // Esta función se ejecuta cada vez que la app Blynk envía un valor al pin virtual
 BLYNK_WRITE(V4) {
+  pinMode(4, OUTPUT); // led rojo 
+  pinMode(2, OUTPUT); // led verde
   int valorRecibido = param.asInt();
-  Serial.print("Paso el umbral de temp? ");
-  Serial.println(valorRecibido);
-  // prendemos el led 
-  pinMode(5, OUTPUT); // led rojo 
-  pinMode(19, OUTPUT); // led verde
-  digitalWrite(5, LOW);    
-  digitalWrite(19, HIGH); 
+  if (valorRecibido  == 0) { // La temperatura esta por arriba de 24 grados        
+    Serial.print(F("Apagando estufa ..."));
+    digitalWrite(4, HIGH);
+    digitalWrite(2, LOW);
+  }   
+  if (valorRecibido  == 1) { // La temperatura esta debajo de 24 grados        
+    Serial.print(F("Prendiendo estufa ..."));
+    digitalWrite(2, HIGH);
+    digitalWrite(4, LOW);
+  }  
+   
 }
 
 
 void setup() {
+
+  pinMode(4, OUTPUT); // led salida de rele
+  //digitalWrite(8, HIGH);
 
   // Para blynk --------------------------------------
   Serial.begin(115200);
@@ -115,7 +124,7 @@ void setup() {
 }  // of method setup()
 void loop() {
 
-
+digitalWrite(4, HIGH);
   /*!
   @brief    Arduino method for the main program loop
   @details  This is the main program for the Arduino IDE, it is an infinite loop and keeps on
