@@ -12,6 +12,7 @@
 const uint32_t SERIAL_SPEED{115200}; 
 const String telegramToken = "7147191029:AAGREYneL5uhnpeu1JXxo2arBKRF3z2PDZ4";
 const String chatID = "1557986943";
+const String apiUrl = "http://10.0.2.43:3000" // Ro's IP
 
 BME680_Class BME680; 
 float altitude(const int32_t press, const float seaLevel = 1013.25);
@@ -40,7 +41,7 @@ double sensorVal, sensorVal1, sensorVal2, sensorVal3 ;
 // This function creates the timer object. It's part of Blynk library 
 BlynkTimer timer; 
 
-void myTimer() {
+void reportDataTimer() {
   // This function describes what will happen with each timer tick
   // e.g. writing sensor value to datastream V5
   
@@ -48,7 +49,61 @@ void myTimer() {
   Blynk.virtualWrite(V0, sensorVal1);  
   Blynk.virtualWrite(V3, sensorVal2);  
   Blynk.virtualWrite(V1, sensorVal3);
+
+  // Send data to blockchain API
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    String url = apiUrl + "/api";
+    String payload = '{"temperature": ' + String(sensorVal) + ', "humidity": ' + String(sensorVal1) + ', "pressure": ' + String(sensorVal2) + ', "airQuality": ' + String(sensorVal3) + '}';
+    http.begin(url);
+    http.addHeader("Content-Type", "application/json");
+    int httpResponseCode = http.POST(payload);
+    if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println(httpResponseCode);
+      Serial.println(response);
+    } else {
+      Serial.println("Error in HTTP request");
+    }    
+    http.end();
+  } else {
+    Serial.println("Error in WiFi connection");
+  }
 }
+
+void getDataTimer() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    String url = apiUrl + "/api";
+    http.begin(url);
+    int httpResponseCode = http.GET();
+    if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println(httpResponseCode);
+      Serial.println(response);
+    } else {
+      Serial.println("Error in HTTP request");
+    }
+    if (httpResponseCode == 200) {
+      // Parse JSON
+      DynamicJsonDocument doc(1024);
+      deserializeJson(doc, http.getString());
+      bool temperature = doc["needsHeat"];
+
+      if (needsHeat) {
+        digitalWrite(2, HIGH);
+        digitalWrite(4, LOW);
+      } else {
+        digitalWrite(4, HIGH);
+        digitalWrite(2, LOW);
+      } 
+    }
+    http.end();
+  } else {
+    Serial.println("Error in WiFi connection");
+  }
+}
+
 
 // Esta función se ejecuta cada vez que la app Blynk envía un valor al pin virtual
 BLYNK_WRITE(V4) {
@@ -77,7 +132,8 @@ void setup() {
   // Para blynk --------------------------------------
   Serial.begin(115200);
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, password );
-  timer.setInterval(30000L, myTimer); 
+  timer.setInterval(30000L, reportDataTimer); 
+  timer.setInterval(50000L, getDataTimer); 
 
 
   // ------------------------------------------------

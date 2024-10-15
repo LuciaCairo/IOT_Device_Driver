@@ -28,7 +28,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { temperature, humidity, pressure, airQuality } = await request.json();
+    const body = await request.json();
+    console.log("Payload: ", body);
+    const { temperature, humidity, pressure, airQuality } = body;
 
     const wallet = new ethers.Wallet(SIGNER_PRIVATE_KEY, provider);
     const contractWithSigner = contract.connect(wallet);
