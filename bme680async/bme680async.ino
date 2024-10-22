@@ -55,15 +55,17 @@ BLYNK_WRITE(V4) {
   pinMode(4, OUTPUT); // led rojo 
   pinMode(2, OUTPUT); // led verde
   int valorRecibido = param.asInt();
-  if (valorRecibido  == 0) { // La temperatura esta por arriba de 24 grados        
+  
+
+  if (valorRecibido  == 0) { // La temperatura esta por arriba de 30 grados      
     Serial.print(F("Apagando estufa ..."));
-    digitalWrite(4, HIGH);
-    digitalWrite(2, LOW);
-  }   
-  if (valorRecibido  == 1) { // La temperatura esta debajo de 24 grados        
-    Serial.print(F("Prendiendo estufa ..."));
-    digitalWrite(2, HIGH);
+    //digitalWrite(4, HIGH);
     digitalWrite(4, LOW);
+  }   
+  if (valorRecibido  == 1) { // La temperatura esta debajo de 28 grados    
+    Serial.print(F("Prendiendo estufa ..."));
+    digitalWrite(4, HIGH);
+    //digitalWrite(4, LOW);
   }  
    
 }
@@ -124,7 +126,6 @@ void setup() {
 }  // of method setup()
 void loop() {
 
-digitalWrite(4, HIGH);
   /*!
   @brief    Arduino method for the main program loop
   @details  This is the main program for the Arduino IDE, it is an infinite loop and keeps on
