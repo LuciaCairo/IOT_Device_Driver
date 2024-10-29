@@ -54,7 +54,8 @@ void reportDataTimer() {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String url = apiUrl + "/api";
-    String payload = '{"temperature": ' + String(sensorVal) + ', "humidity": ' + String(sensorVal1) + ', "pressure": ' + String(sensorVal2) + ', "airQuality": ' + String(sensorVal3) + '}';
+    String payload = '{\"temperature\": ' + String(sensorVal) + ', \"humidity\": ' + String(sensorVal1) + ', \"pressure\": ' + String(sensorVal2) + ', \"airQuality\": ' + String(sensorVal3) + '}';
+    Serial.println("Payload: " + payload);
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
     int httpResponseCode = http.POST(payload);
