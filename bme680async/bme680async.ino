@@ -54,7 +54,7 @@ void reportDataTimer() {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String url = apiUrl + "/api";
-    String payload = '{\"temperature\": ' + String(sensorVal) + ', \"humidity\": ' + String(sensorVal1) + ', \"pressure\": ' + String(sensorVal2) + ', \"airQuality\": ' + String(sensorVal3) + '}';
+    String payload = "{\"temperature\": " + String(sensorVal) + ", \"humidity\": " + String(sensorVal1) + ", \"pressure\": " + String(sensorVal2) + ", \"airQuality\": " + String(sensorVal3) + "}";
     Serial.println("Payload: " + payload);
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
@@ -79,17 +79,24 @@ void getDataTimer() {
     http.begin(url);
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
-      String response = http.getString();
+      
       Serial.println(httpResponseCode);
-      Serial.println(response);
+      
     } else {
       Serial.println("Error in HTTP request");
-    }
+    } 
+    
     if (httpResponseCode == 200) {
       // Parse JSON
+      String response = http.getString();
+      Serial.println(response);
       DynamicJsonDocument doc(1024);
-      deserializeJson(doc, http.getString());
+      deserializeJson(doc, response);
       bool needsHeat = doc["needsHeat"];
+      serializeJson(doc,Serial);
+  
+      Serial.print(needsHeat);
+
 
       if (needsHeat) {
         digitalWrite(2, HIGH);
