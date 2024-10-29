@@ -12,7 +12,7 @@
 const uint32_t SERIAL_SPEED{115200}; 
 const String telegramToken = "7147191029:AAGREYneL5uhnpeu1JXxo2arBKRF3z2PDZ4";
 const String chatID = "1557986943";
-const String apiUrl = "http://10.0.2.43:3000" // Ro's IP
+const String apiUrl = "http://10.65.2.194:3000" // Ro's IP
 
 BME680_Class BME680; 
 float altitude(const int32_t press, const float seaLevel = 1013.25);
