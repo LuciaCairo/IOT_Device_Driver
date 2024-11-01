@@ -32,8 +32,8 @@ float altitude(const int32_t press, const float seaLevel) {
   return (Altitude);
 }  // of method altitude()
 
-const char* ssid = "LABORATORIO-B"; //"A15 de Luci";
-const char* password = ""; //"luciicai";
+const char* ssid = "LABORATORIO-B"; 
+const char* password = ""; 
 
 // Declaring a global variabl for sensor data
 double sensorVal, sensorVal1, sensorVal2, sensorVal3 ; 
