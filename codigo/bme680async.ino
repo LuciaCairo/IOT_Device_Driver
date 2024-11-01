@@ -7,12 +7,12 @@
 #include <WiFi.h>
 #include <HTTPClient.h> // para telegram
 #include <BlynkSimpleEsp32.h>
-
+#include <ArduinoJson.h> 
 
 const uint32_t SERIAL_SPEED{115200}; 
 const String telegramToken = "7147191029:AAGREYneL5uhnpeu1JXxo2arBKRF3z2PDZ4";
 const String chatID = "1557986943";
-const String apiUrl = "http://10.0.2.43:3000" // Ro's IP
+const String apiUrl = "http://10.65.2.194:3000"; // Ro's IP
 
 BME680_Class BME680; 
 float altitude(const int32_t press, const float seaLevel = 1013.25);
@@ -54,7 +54,8 @@ void reportDataTimer() {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String url = apiUrl + "/api";
-    String payload = '{"temperature": ' + String(sensorVal) + ', "humidity": ' + String(sensorVal1) + ', "pressure": ' + String(sensorVal2) + ', "airQuality": ' + String(sensorVal3) + '}';
+    String payload = "{\"temperature\": " + String(sensorVal) + ", \"humidity\": " + String(sensorVal1) + ", \"pressure\": " + String(sensorVal2) + ", \"airQuality\": " + String(sensorVal3) + "}";
+    Serial.println("Payload: " + payload);
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
     int httpResponseCode = http.POST(payload);
@@ -78,17 +79,24 @@ void getDataTimer() {
     http.begin(url);
     int httpResponseCode = http.GET();
     if (httpResponseCode > 0) {
-      String response = http.getString();
+      
       Serial.println(httpResponseCode);
-      Serial.println(response);
+      
     } else {
       Serial.println("Error in HTTP request");
-    }
+    } 
+    
     if (httpResponseCode == 200) {
       // Parse JSON
+      String response = http.getString();
+      Serial.println(response);
       DynamicJsonDocument doc(1024);
-      deserializeJson(doc, http.getString());
-      bool temperature = doc["needsHeat"];
+      deserializeJson(doc, response);
+      bool needsHeat = doc["needsHeat"];
+      serializeJson(doc,Serial);
+  
+      Serial.print(needsHeat);
+
 
       if (needsHeat) {
         digitalWrite(2, HIGH);
